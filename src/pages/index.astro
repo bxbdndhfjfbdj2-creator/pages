@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import {sections} from '../config/sections';
+import {getApps,href} from '../lib/site';
+import site from '../data/site.json';
+const apps=getApps();
+const groups=await Promise.all(sections.map(async section=>({
+ section,entries:(await getCollection(section.collection)).filter(x=>!x.data.draft)
+})));
+const all=groups.flatMap(g=>g.entries.map(entry=>({section:g.section,entry})));
+const featured=all.filter(x=>x.entry.data.featured).sort((a,b)=>b.entry.data.order-a.entry.data.order).slice(0,6);
+const recent=all.sort((a,b)=>+b.entry.data.date- +a.entry.data.date).slice(0,6);
+---
+<Layout>
+  <section class="shell hero">
+    <p class="eyebrow">GITHUB-POWERED PERSONAL PORTAL</p>
+    <h1>{site.heroTitle}<span class="accent">.</span></h1>
+    <p class="lead">{site.heroDescription}</p>
+    <div class="actions"><a class="button button-primary" href={href('research/')}>探索研究</a><a class="button button-light" href={href('apps/')}>查看 HTML 作品</a></div>
+    <div class="hero-metrics"><span><b>{all.length+apps.length}</b> 项公开内容</span><span><b>{sections.length+1}</b> 个主题栏目</span></div>
+  </section>
+  <section class="shell section">
+    <div class="section-title"><div><p class="eyebrow">SECTIONS</p><h2>内容导航</h2></div><p>研究、论文、项目、写作及知识记录集中呈现。</p></div>
+    <div class="section-grid">
+      {sections.map(s=><a class="section-tile" href={href(s.slug+'/')}><span class="tile-icon">{s.icon}</span><h3>{s.title}</h3><p>{s.description}</p><span class="tile-arrow">↗</span></a>)}
+      <a class="section-tile" href={href('apps/')}><span class="tile-icon">▧</span><h3>HTML 实验室</h3><p>独立 HTML 文档、JSON 数据与交互可视化</p><span class="tile-arrow">↗</span></a>
+    </div>
+  </section>
+  {featured.length>0&&<section class="shell section"><div class="section-title"><div><p class="eyebrow">FEATURED</p><h2>精选内容</h2></div></div>
+    <div class="cards">{featured.map(({entry,section})=><article class="card"><span class="tag">{section.title}</span><h3><a href={href(section.slug+'/'+entry.id+'/')}>{entry.data.title}</a></h3><p>{entry.data.summary}</p><a class="read-more" href={href(section.slug+'/'+entry.id+'/')}>了解更多 ↗</a></article>)}</div>
+  </section>}
+  {apps.length>0&&<section class="shell section"><div class="section-title"><div><p class="eyebrow">INTERACTIVE</p><h2>HTML 实验室</h2></div><a class="read-more" href={href('apps/')}>全部作品 ↗</a></div>
+    <div class="cards">{apps.slice(0,3).map(a=><article class="card"><span class="tag">{a.category}</span><h3><a href={href('apps/'+a.slug+'/')}>{a.title}</a></h3><p>{a.description}</p><a class="read-more" href={href('apps/'+a.slug+'/')}>打开页面 ↗</a></article>)}</div>
+  </section>}
+  <section class="shell section"><div class="section-title"><div><p class="eyebrow">LATEST</p><h2>最近更新</h2></div><a class="read-more" href={href('search/')}>搜索全部内容 ↗</a></div>
+    <div class="cards">{recent.map(({entry,section})=><article class="card"><span class="tag">{section.title}</span><h3><a href={href(section.slug+'/'+entry.id+'/')}>{entry.data.title}</a></h3><p>{entry.data.summary}</p><a class="read-more" href={href(section.slug+'/'+entry.id+'/')}>阅读详情 ↗</a></article>)}</div>
+  </section>
+</Layout>

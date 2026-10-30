@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import {href} from '../lib/site';
+---
+<Layout title="站内搜索">
+<section class="shell page-top"><p class="eyebrow">SEARCH</p><h1>站内搜索</h1><p>检索研究专题、论文、项目、文章与知识内容。搜索索引会随每次发布重新生成。</p></section>
+<section class="shell search-area">
+<link rel="stylesheet" href={href('pagefind/pagefind-ui.css')}/>
+<div id="search"></div>
+<script is:inline src={href('pagefind/pagefind-ui.js')}></script>
+<script is:inline define:vars={{bundlePath:href('pagefind/')}}>
+  window.addEventListener('DOMContentLoaded',()=>{
+   if(window.PagefindUI){new window.PagefindUI({element:'#search',showSubResults:true,bundlePath});}
+   else {document.querySelector('#search').textContent='搜索组件尚未加载，请刷新页面。';}
+  });
+</script>
+</section>
+</Layout>

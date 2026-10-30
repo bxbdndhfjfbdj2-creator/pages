@@ -1,0 +1,11 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {getApps,href} from '../../lib/site';
+const apps=getApps();
+---
+<Layout title="HTML 实验室">
+<section class="shell page-top"><p class="eyebrow">INTERACTIVE & HTML</p><h1>HTML 实验室</h1><p>托管独立 HTML 网页、JSON 数据可视化、交互式工具及研究作品。</p><small>{apps.length} 个可访问页面 · 新增文件夹后自动收录</small></section>
+<section class="shell section"><div class="cards">
+{apps.map(a=><article class="card"><span class="tag">{a.category}</span><h3><a href={href('apps/'+a.slug+'/')}>{a.title}</a></h3><p>{a.description}</p><div class="tags">{a.tags.map(t=><span class="tag tag-light">{t}</span>)}</div><a class="read-more" href={href('apps/'+a.slug+'/')}>查看网页 ↗</a></article>)}
+</div></section>
+</Layout>

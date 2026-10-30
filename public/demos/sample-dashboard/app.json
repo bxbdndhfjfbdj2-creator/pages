@@ -1,0 +1,11 @@
+{
+  "title": "HTML + JSON 数据展示",
+  "description": "完整 HTML 网页读取同文件夹的 data.json，自动绘制交互式数据条形图。",
+  "category": "数据可视化",
+  "tags": [
+    "HTML",
+    "JSON",
+    "JavaScript"
+  ],
+  "featured": true
+}

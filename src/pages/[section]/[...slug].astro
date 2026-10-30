@@ -1,0 +1,28 @@
+---
+import {getCollection,render} from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import {sections} from '../../config/sections';
+import {href,resource} from '../../lib/site';
+export async function getStaticPaths(){
+ const groups=await Promise.all(sections.map(async s=>({
+   section:s,entries:(await getCollection(s.collection)).filter(x=>!x.data.draft)
+ })));
+ return groups.flatMap(g=>g.entries.map(entry=>({params:{section:g.section.slug,slug:entry.id},props:{section:g.section,entry}})));
+}
+const {section,entry}=Astro.props;
+const {Content}=await render(entry);
+const links=[...entry.data.links];
+if(entry.data.repo)links.push({label:'GitHub 项目',url:entry.data.repo});
+if(entry.data.doi)links.push({label:'DOI',url:'https://doi.org/'+entry.data.doi});
+---
+<Layout title={entry.data.title} description={entry.data.summary}>
+<article class="shell article">
+  <div class="entry-top"><a class="back-link" href={href(section.slug+'/')}>← 返回{section.title}</a><span class="tag">{section.title}</span></div>
+  <h1>{entry.data.title}</h1>
+  <p class="article-lead">{entry.data.summary}</p>
+  <div class="article-meta"><time datetime={entry.data.date.toISOString()}>{entry.data.date.toLocaleDateString('zh-CN')}</time>{entry.data.authors&&<span> · {entry.data.authors.join('、')}</span>}{entry.data.venue&&<span> · {entry.data.venue}</span>}</div>
+  <div class="tags">{entry.data.tags.map(tag=><span class="tag tag-light">{tag}</span>)}</div>
+  <div class="prose"><Content/></div>
+  {links.length>0&&<div class="resources"><h2>相关资源</h2>{links.map(l=><a href={resource(l.url)} target="_blank" rel="noopener noreferrer">{l.label} ↗</a>)}</div>}
+</article>
+</Layout>

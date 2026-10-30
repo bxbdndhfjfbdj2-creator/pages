@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {getApps,href} from '../../lib/site';
+export function getStaticPaths(){return getApps().map(a=>({params:{slug:a.slug},props:{app:a}}));}
+const {app}=Astro.props;
+const raw=href('demos/'+app.slug+'/index.html');
+---
+<Layout title={app.title} description={app.description}>
+<section class="shell page-top">
+  <a class="back-link" href={href('apps/')}>← 返回 HTML 实验室</a>
+  <p class="eyebrow">HTML / JSON / JAVASCRIPT</p><h1>{app.title}</h1><p>{app.description}</p>
+  <div class="actions"><a class="button button-primary" target="_blank" rel="noopener noreferrer" href={raw}>全屏打开 HTML ↗</a>
+  <a class="button button-light" target="_blank" rel="noopener noreferrer" href={href('demos/'+app.slug+'/')}>直接访问子页面</a></div>
+</section>
+<section class="shell frame-wrap"><iframe title={app.title} src={raw} loading="eager"></iframe></section>
+</Layout>

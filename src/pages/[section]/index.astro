@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import {sections} from '../../config/sections';
+import {href} from '../../lib/site';
+export function getStaticPaths(){return sections.map(s=>({params:{section:s.slug},props:{section:s}}));}
+const {section}=Astro.props;
+const entries=(await getCollection(section.collection)).filter(x=>!x.data.draft).sort((a,b)=>b.data.order-a.data.order||+b.data.date- +a.data.date);
+const tags=[...new Set(entries.flatMap(e=>e.data.tags))];
+---
+<Layout title={section.title} description={section.description}>
+  <section class="shell page-top"><p class="eyebrow">COLLECTION</p><h1>{section.title}</h1><p>{section.description}</p><small>{entries.length} 条内容 · {tags.length} 个标签</small></section>
+  <section class="shell section">
+    {tags.length>0&&<div class="tags">{tags.map(tag=><span class="tag">{tag}</span>)}</div>}
+    <div class="cards">
+    {entries.map(entry=><article class="card"><div class="card-meta"><span class="tag">{section.title}</span><time datetime={entry.data.date.toISOString()}>{entry.data.date.toLocaleDateString('zh-CN')}</time></div><h3><a href={href(section.slug+'/'+entry.id+'/')}>{entry.data.title}</a></h3><p>{entry.data.summary}</p><div class="tags">{entry.data.tags.map(tag=><span class="tag tag-light">{tag}</span>)}</div><a class="read-more" href={href(section.slug+'/'+entry.id+'/')}>阅读详情 ↗</a></article>)}
+    </div>
+    {entries.length===0&&<p>本栏目暂无公开内容。</p>}
+  </section>
+</Layout>

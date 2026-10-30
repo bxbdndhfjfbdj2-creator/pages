@@ -1,0 +1,40 @@
+---
+import site from '../data/site.json';
+import {sections} from '../config/sections';
+import {href} from '../lib/site';
+import '../styles/global.css';
+const {title=site.name,description=site.description}=Astro.props;
+const current=Astro.url.pathname;
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description}/>
+  <meta name="color-scheme" content="light"/>
+  <link rel="canonical" href={Astro.url.href}/>
+  <title>{title===site.name ? title : title+' · '+site.shortName}</title>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell topbar">
+      <a class="logo" href={href('')}><span class="logo-icon">◍</span>{site.shortName}</a>
+      <nav aria-label="主导航">
+        <a class={current===href('')?'active':''} href={href('')}>首页</a>
+        <a class={current.startsWith(href('about/'))?'active':''} href={href('about/')}>关于</a>
+        {sections.map(s=><a class={current.startsWith(href(s.slug+'/'))?'active':''} href={href(s.slug+'/')}>{s.title}</a>)}
+        <a class={current.startsWith(href('apps/'))?'active':''} href={href('apps/')}>HTML 实验室</a>
+        <a class={current.startsWith(href('search/'))?'active':''} href={href('search/')}>搜索</a>
+      </nav>
+    </div>
+  </header>
+  <main data-pagefind-body><slot /></main>
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <span>© {new Date().getFullYear()} {site.name} · 内容持续更新</span>
+      <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </div>
+  </footer>
+</body>
+</html>
